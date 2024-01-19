@@ -1,0 +1,135 @@
+#Assignment 1
+
+instructorID=[]
+instructorName=[]
+instructorDept=[]
+departmentName=[]
+departmentLocation=[]
+departmentBudget=[]
+
+def nonblank_lines(f):
+    for l in f:
+        line = l.rstrip() #rstrip removing the trailing whitespaces to the right of any txt line
+        if line:
+            yield line
+
+def readData():
+    #Using the with statement to make code easier to read & release resources after reading text file
+    with open('instructor.txt') as f_in:
+        for line in nonblank_lines(f_in):   #for loop
+            values=line.split(",")      #spliting each item by the comma
+            instructorID.append(values[0])
+            instructorName.append(values[1])
+            instructorDept.append(values[2])
+        f_in.close()
+    Filedepartment=open("department.txt")
+    line=Filedepartment.readline()
+    while line:
+        values=line.split(",")
+        departmentName.append(values[0])
+        departmentLocation.append(values[1])
+        departmentBudget.append(int(values[2].rstrip()))
+        line=Filedepartment.readline()
+    Filedepartment.close()
+
+def menu():
+    print("1. Enter the instructor ID and I will provide you with the name of the instructor, affiliated department and the location of that department.")
+    print("2. Enter the department name and I will provide you with the location, budget and names of all instructors that work for the department.")
+    print("3. Insert a record about a new instructor.")
+    print("4. Delete a record")
+    print("5. Exit")
+    choice=int(input("Enter you choice: "))
+    return choice
+
+def findInstructor():
+    Fileinstructor = open('instructor.txt')
+# use readline() to read the first line 
+    line = Fileinstructor.readline()
+    id=input("\nEnter the instructor ID: ")
+    if id in instructorID:
+        idIndex=instructorID.index(id)
+        name=instructorName[idIndex]
+        dept=instructorDept[idIndex]
+        deptIndex=departmentName.index(dept)
+        location=departmentLocation[deptIndex]
+        print("\nInstructor Name: "+name)
+        print("Affiliated department: "+dept)
+        print("Department Location: "+location)
+    else:
+        print("The ID does not exist in the database and hence cannot be searched")
+    print()
+        
+def findDepartment():
+    deptName=input("Enter the department name: ")
+    if deptName in departmentName:
+        deptIndex=departmentName.index(deptName)
+        location=departmentLocation[deptIndex]
+        budget=departmentBudget[deptIndex]
+        print("\nDepartment Location: "+location)
+        print("Department Budget: $"+str(budget))
+        print("Instructors that work for the department: ")
+    else:
+        print("\nDepartment does not exist and hence the record cannod be added \n")
+    for i in range (len(instructorName)):
+        if instructorDept[i]==deptName:
+            print(instructorName[i])
+    print()
+
+def addInstructor():
+    id=input("Enter the instructor id: ")
+    if(id in instructorID):
+        print("\nInstructor id already exists in the file\n")
+        return
+    name=input("Enter the instructor name: ")
+    dept=input("Enter the affiliated department name: ")
+    if(dept not in departmentName):
+        print("\nThe department does not exist and hence the instructor record cannot be added to the database\n")
+        return
+    f=open("instructor.txt", "a+")
+    f.write("\n"+id+","+name+","+dept+"")
+    f.close()
+    print("Record added to the database")
+    instructorID.append(id)
+    instructorName.append(name)
+    instructorDept.append(dept)
+    print()
+
+def deleteRecord():
+    id=input("Enter the instructor id: ")
+    if(id in instructorID):
+        f=open("instructor.txt")
+        idIndex=instructorID.index(id)
+        instructorID.remove(id)
+        name = instructorName[idIndex]
+        instructorName.remove(name)
+        dept = instructorDept[idIndex]
+        instructorDept.remove(dept)
+        lines = f.readlines()
+        for index, line in enumerate(lines):
+            if line.startswith(id):
+                lines[index] = ""
+        with open("instructor.txt","w") as f:
+            f.writelines(lines)
+            f.close()
+    else:
+        print("id does not exist \n")
+        
+    print("record deleted from the database")
+
+def main():
+    readData() #Calling function to read the txt
+    while True:
+        userChoice=menu()
+        if(userChoice==1):
+            findInstructor()
+        elif(userChoice==2):
+            findDepartment()
+        elif(userChoice==3):
+            addInstructor()
+        elif(userChoice==4):
+            deleteRecord()
+        elif(userChoice ==5):
+            break
+        else:
+            print("Invalid choice! Try again!!!\n")
+main()
